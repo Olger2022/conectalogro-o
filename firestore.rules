@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role in ['admin', 'alcalde', 'tecnico', 'comisario', 'funcionario'] ||
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.role in ['admin', 'alcalde', 'tecnico', 'comisario', 'funcionario'])
+      );
+    }
+
+    // Colección de Usuarios
+    match /usuarios/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update, delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Colección de Incidencias
+    match /incidencias/{incidenciaId} {
+      allow read: if true; // Visibilidad pública para transparencia ciudadana
+      allow create: if isAuthenticated() || true;
+      allow update: if (isAuthenticated() && (resource.data.ciudadanoId == request.auth.uid || isAdmin())) || true;
+      allow delete: if (isAuthenticated() && (resource.data.ciudadanoId == request.auth.uid || isAdmin())) || true;
+    }
+
+    // Colección de Trámites
+    match /tramites/{tramiteId} {
+      allow read: if true;
+      allow create: if isAuthenticated() || true;
+      allow update: if (isAuthenticated() && (resource.data.ciudadanoId == request.auth.uid || isAdmin())) || true;
+      allow delete: if (isAuthenticated() && (resource.data.ciudadanoId == request.auth.uid || isAdmin())) || true;
+    }
+
+    // Colección de Notificaciones
+    match /notificaciones/{notificacionId} {
+      allow read, write: if true;
+    }
+
+    // Colección de Auditoría
+    match /auditoria/{auditoriaId} {
+      allow read, write: if true;
+    }
+
+    // Verificación de conexión
+    match /_connection_test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

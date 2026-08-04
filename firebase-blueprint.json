@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Incidencia": {
+      "title": "Incidencia",
+      "description": "Reporte de incidencia o problemas urbanos en Logroño",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigoTracking": { "type": "string" },
+        "titulo": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "categoria": { "type": "string" },
+        "prioridad": { "type": "string" },
+        "estado": { "type": "string" },
+        "ciudadanoId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "codigoTracking", "titulo", "estado"]
+    },
+    "Tramite": {
+      "title": "Tramite",
+      "description": "Solicitud de trámite municipal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "numeroExpediente": { "type": "string" },
+        "tituloTramite": { "type": "string" },
+        "estado": { "type": "string" },
+        "ciudadanoId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "numeroExpediente", "tituloTramite", "estado"]
+    },
+    "Notificacion": {
+      "title": "Notificacion",
+      "description": "Notificación al ciudadano",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "usuarioId": { "type": "string" },
+        "titulo": { "type": "string" },
+        "mensaje": { "type": "string" },
+        "leida": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "usuarioId", "titulo", "mensaje"]
+    },
+    "AuditoriaLog": {
+      "title": "AuditoriaLog",
+      "description": "Registro de auditoría de acciones del sistema",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "usuarioId": { "type": "string" },
+        "accion": { "type": "string" },
+        "entidad": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "usuarioId", "accion", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/incidencias/{incidenciaId}": {
+      "schema": { "$ref": "#/entities/Incidencia" },
+      "description": "Colección de incidencias"
+    },
+    "/tramites/{tramiteId}": {
+      "schema": { "$ref": "#/entities/Tramite" },
+      "description": "Colección de trámites"
+    },
+    "/notificaciones/{notificacionId}": {
+      "schema": { "$ref": "#/entities/Notificacion" },
+      "description": "Colección de notificaciones"
+    },
+    "/auditoria/{auditoriaId}": {
+      "schema": { "$ref": "#/entities/AuditoriaLog" },
+      "description": "Colección de registros de auditoría"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Box, Alert, Button, Typography, Chip } from '@mui/material';
-import { Wifi, WifiOff, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, CheckCircle2, Database } from 'lucide-react';
 import { useAppStore } from '../../stores/useAppStore';
 import { apiService } from '../../services/apiService';
 
@@ -37,10 +37,6 @@ export const OfflineSyncBanner: React.FC = () => {
       setTimeout(() => setLastSyncSuccess(false), 4000);
     }
   };
-
-  if (isOnline && pendingSyncCount === 0 && !lastSyncSuccess) {
-    return null;
-  }
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -107,7 +103,7 @@ export const OfflineSyncBanner: React.FC = () => {
           icon={<CheckCircle2 size={20} />}
           sx={{ borderRadius: 0, py: 0.5 }}
         >
-          ¡Sincronización completada exitosamente con la base de datos municipal!
+          ¡Sincronización completada exitosamente con la base de datos municipal Firebase (proyectoveterinario2026)!
         </Alert>
       )}
     </Box>

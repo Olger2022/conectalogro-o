@@ -12,6 +12,62 @@ import {
 } from '../types';
 import { INCIDENCIAS_SEED, TRAMITES_SEED, AUDITORIA_SEED } from '../constants';
 import { offlineDB, isOnline } from '../db/dexieDB';
+import { db, auth, testFirestoreConnection } from '../firebase/firebaseConfig';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  onSnapshot,
+  Unsubscribe
+} from 'firebase/firestore';
+
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  };
+}
+
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
 
 class ApiService {
   private incidenciasInMemory: Incidencia[] = [...INCIDENCIAS_SEED];
@@ -40,8 +96,12 @@ class ApiService {
   ];
   private auditoriaInMemory: AuditoriaLog[] = [...AUDITORIA_SEED];
 
+  private unsubscribes: Unsubscribe[] = [];
+  public isFirestoreLive = false;
+
   constructor() {
     this.initDexieCache();
+    this.initFirestoreRealtimeSync();
   }
 
   private async initDexieCache() {
@@ -56,6 +116,145 @@ class ApiService {
       }
     } catch (err) {
       console.warn('Dexie DB initialization notice:', err);
+    }
+  }
+
+  /**
+   * Automatic Real-Time Synchronization with Firebase Firestore
+   */
+  public async initFirestoreRealtimeSync() {
+    try {
+      // Test connection
+      await testFirestoreConnection();
+
+      // 1. Sync Incidencias
+      const incRef = collection(db, 'incidencias');
+      const unsubInc = onSnapshot(
+        incRef,
+        async (snapshot) => {
+          this.isFirestoreLive = true;
+          if (!snapshot.empty) {
+            const remoteIncidencias: Incidencia[] = [];
+            snapshot.forEach((docSnap) => {
+              remoteIncidencias.push(docSnap.data() as Incidencia);
+            });
+            
+            // Merge with local items
+            const mergedMap = new Map<string, Incidencia>();
+            this.incidenciasInMemory.forEach(item => mergedMap.set(item.id, item));
+            remoteIncidencias.forEach(item => mergedMap.set(item.id, item));
+            
+            this.incidenciasInMemory = Array.from(mergedMap.values()).sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+
+            // Update Dexie
+            try {
+              await offlineDB.incidencias.clear();
+              await offlineDB.incidencias.bulkAdd(this.incidenciasInMemory);
+            } catch (e) {}
+          } else {
+            // Seed initial data to Firestore if completely empty
+            for (const inc of this.incidenciasInMemory) {
+              await setDoc(doc(db, 'incidencias', inc.id), inc).catch(() => {});
+            }
+          }
+        },
+        (error) => {
+          console.warn('Firestore incidencias subscription error:', error);
+        }
+      );
+      this.unsubscribes.push(unsubInc);
+
+      // 2. Sync Trámites
+      const trmRef = collection(db, 'tramites');
+      const unsubTrm = onSnapshot(
+        trmRef,
+        async (snapshot) => {
+          if (!snapshot.empty) {
+            const remoteTramites: Tramite[] = [];
+            snapshot.forEach((docSnap) => {
+              remoteTramites.push(docSnap.data() as Tramite);
+            });
+
+            const mergedMap = new Map<string, Tramite>();
+            this.tramitesInMemory.forEach(item => mergedMap.set(item.id, item));
+            remoteTramites.forEach(item => mergedMap.set(item.id, item));
+
+            this.tramitesInMemory = Array.from(mergedMap.values()).sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+
+            try {
+              await offlineDB.tramites.clear();
+              await offlineDB.tramites.bulkAdd(this.tramitesInMemory);
+            } catch (e) {}
+          } else {
+            for (const trm of this.tramitesInMemory) {
+              await setDoc(doc(db, 'tramites', trm.id), trm).catch(() => {});
+            }
+          }
+        },
+        (error) => {
+          console.warn('Firestore tramites subscription error:', error);
+        }
+      );
+      this.unsubscribes.push(unsubTrm);
+
+      // 3. Sync Notificaciones
+      const notifRef = collection(db, 'notificaciones');
+      const unsubNotif = onSnapshot(
+        notifRef,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const remoteNotifs: Notificacion[] = [];
+            snapshot.forEach((docSnap) => {
+              remoteNotifs.push(docSnap.data() as Notificacion);
+            });
+
+            const mergedMap = new Map<string, Notificacion>();
+            this.notificacionesInMemory.forEach(item => mergedMap.set(item.id, item));
+            remoteNotifs.forEach(item => mergedMap.set(item.id, item));
+
+            this.notificacionesInMemory = Array.from(mergedMap.values()).sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          }
+        },
+        (error) => {
+          console.warn('Firestore notificaciones subscription error:', error);
+        }
+      );
+      this.unsubscribes.push(unsubNotif);
+
+      // 4. Sync Auditoría
+      const auditRef = collection(db, 'auditoria');
+      const unsubAudit = onSnapshot(
+        auditRef,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const remoteAudit: AuditoriaLog[] = [];
+            snapshot.forEach((docSnap) => {
+              remoteAudit.push(docSnap.data() as AuditoriaLog);
+            });
+
+            const mergedMap = new Map<string, AuditoriaLog>();
+            this.auditoriaInMemory.forEach(item => mergedMap.set(item.id, item));
+            remoteAudit.forEach(item => mergedMap.set(item.id, item));
+
+            this.auditoriaInMemory = Array.from(mergedMap.values()).sort(
+              (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+            );
+          }
+        },
+        (error) => {
+          console.warn('Firestore auditoria subscription error:', error);
+        }
+      );
+      this.unsubscribes.push(unsubAudit);
+
+    } catch (err) {
+      console.warn('Firestore initialization fallback:', err);
     }
   }
 
@@ -142,9 +341,20 @@ class ApiService {
 
     this.incidenciasInMemory.unshift(newIncidencia);
 
+    // Save locally
     try {
       await offlineDB.incidencias.add(newIncidencia);
-      if (!isOnline()) {
+    } catch (e) {}
+
+    // Save to Firestore
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'incidencias', newIncidencia.id), newIncidencia);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `incidencias/${newIncidencia.id}`);
+      }
+    } else {
+      try {
         await offlineDB.syncQueue.add({
           id: `sync-${Date.now()}`,
           type: 'INCIDENCIA_CREATE',
@@ -152,9 +362,7 @@ class ApiService {
           createdAt: new Date().toISOString(),
           attempts: 0,
         });
-      }
-    } catch (e) {
-      console.error('Offline storage write error:', e);
+      } catch (e) {}
     }
 
     this.recordAuditLog({
@@ -199,9 +407,18 @@ class ApiService {
     };
 
     this.updateInMemoryIncidencia(updatedInc);
+
     try {
       await offlineDB.incidencias.put(updatedInc);
     } catch (e) {}
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'incidencias', updatedInc.id), updatedInc);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `incidencias/${updatedInc.id}`);
+      }
+    }
 
     // Add notification to citizen
     this.createNotification({
@@ -245,9 +462,18 @@ class ApiService {
     };
 
     this.updateInMemoryIncidencia(updatedInc);
+
     try {
       await offlineDB.incidencias.put(updatedInc);
     } catch (e) {}
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'incidencias', updatedInc.id), updatedInc);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `incidencias/${updatedInc.id}`);
+      }
+    }
 
     return updatedInc;
   }
@@ -306,7 +532,7 @@ class ApiService {
       estado: 'Registrado',
       departamentoResponsable: data.departamentoResponsable,
       montoPagoUSD: data.montoPagoUSD,
-      pagoRealizado: true, // Auto simulated payment success
+      pagoRealizado: true,
       comentarios: [],
       timeline: [
         {
@@ -323,9 +549,18 @@ class ApiService {
     };
 
     this.tramitesInMemory.unshift(newTramite);
+
     try {
       await offlineDB.tramites.add(newTramite);
     } catch (e) {}
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'tramites', newTramite.id), newTramite);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `tramites/${newTramite.id}`);
+      }
+    }
 
     this.recordAuditLog({
       usuarioId: data.ciudadano.id,
@@ -374,9 +609,18 @@ class ApiService {
     };
 
     this.updateInMemoryTramite(updatedTramite);
+
     try {
       await offlineDB.tramites.put(updatedTramite);
     } catch (e) {}
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'tramites', updatedTramite.id), updatedTramite);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `tramites/${updatedTramite.id}`);
+      }
+    }
 
     this.createNotification({
       usuarioId: tramite.ciudadanoId,
@@ -408,10 +652,17 @@ class ApiService {
 
   async markNotificationRead(id: string): Promise<void> {
     const notif = this.notificacionesInMemory.find((n) => n.id === id);
-    if (notif) notif.leida = true;
+    if (notif) {
+      notif.leida = true;
+      if (isOnline()) {
+        try {
+          await setDoc(doc(db, 'notificaciones', notif.id), notif);
+        } catch (e) {}
+      }
+    }
   }
 
-  private createNotification(data: Omit<Notificacion, 'id' | 'leida' | 'createdAt'>): void {
+  private async createNotification(data: Omit<Notificacion, 'id' | 'leida' | 'createdAt'>): Promise<void> {
     const notif: Notificacion = {
       ...data,
       id: `notif-${Date.now()}`,
@@ -419,6 +670,12 @@ class ApiService {
       createdAt: new Date().toISOString(),
     };
     this.notificacionesInMemory.unshift(notif);
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'notificaciones', notif.id), notif);
+      } catch (e) {}
+    }
   }
 
   // AUDIT LOGS
@@ -428,7 +685,7 @@ class ApiService {
     );
   }
 
-  private recordAuditLog(data: Omit<AuditoriaLog, 'id' | 'ipAddress' | 'timestamp'>): void {
+  private async recordAuditLog(data: Omit<AuditoriaLog, 'id' | 'ipAddress' | 'timestamp'>): Promise<void> {
     const log: AuditoriaLog = {
       ...data,
       id: `aud-${Date.now()}`,
@@ -436,6 +693,12 @@ class ApiService {
       timestamp: new Date().toISOString(),
     };
     this.auditoriaInMemory.unshift(log);
+
+    if (isOnline()) {
+      try {
+        await setDoc(doc(db, 'auditoria', log.id), log);
+      } catch (e) {}
+    }
   }
 
   // HELPER METHODS
@@ -478,7 +741,11 @@ class ApiService {
 
       let syncedCount = 0;
       for (const item of items) {
-        // Sync item to backend memory / Firestore
+        if (item.type === 'INCIDENCIA_CREATE' && item.payload) {
+          await setDoc(doc(db, 'incidencias', item.payload.id), item.payload).catch(() => {});
+        } else if (item.type === 'TRAMITE_CREATE' && item.payload) {
+          await setDoc(doc(db, 'tramites', item.payload.id), item.payload).catch(() => {});
+        }
         syncedCount++;
         await offlineDB.syncQueue.delete(item.id);
       }
