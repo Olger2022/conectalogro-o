@@ -1,0 +1,6 @@
+{
+  "name": "LOGROÑO CONECTA",
+  "description": "Plataforma de Participación Ciudadana, Gestión de Incidencias y Trámites Municipales del GAD Municipal del Cantón Logroño, Morona Santiago.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
