@@ -57,6 +57,26 @@
         "timestamp": { "type": "string" }
       },
       "required": ["id", "usuarioId", "accion", "timestamp"]
+    },
+    "Usuario": {
+      "title": "Usuario",
+      "description": "Perfil de usuario ciudadano o funcionario del GAD Municipal de Logroño",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "cedula": { "type": "string" },
+        "nombres": { "type": "string" },
+        "apellidos": { "type": "string" },
+        "email": { "type": "string" },
+        "telefono": { "type": "string" },
+        "direccion": { "type": "string" },
+        "parroquia": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "isVerified": { "type": "boolean" }
+      },
+      "required": ["id", "uid", "email", "nombres", "apellidos", "role"]
     }
   },
   "firestore": {
@@ -75,6 +95,10 @@
     "/auditoria/{auditoriaId}": {
       "schema": { "$ref": "#/entities/AuditoriaLog" },
       "description": "Colección de registros de auditoría"
+    },
+    "/usuarios/{userId}": {
+      "schema": { "$ref": "#/entities/Usuario" },
+      "description": "Colección de usuarios y perfiles de ciudadanos/funcionarios"
     }
   }
 }

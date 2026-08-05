@@ -107,7 +107,7 @@ export const IncidenciasView: React.FC<IncidenciasViewProps> = ({
 
       {/* Filter Toolbar */}
       <Paper sx={{ p: 2, mb: 3, borderRadius: 3 }}>
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={2} sx={{ alignItems: 'center' }}>
           <Grid size={{ xs: 12, md: 4 }}>
             <TextField
               fullWidth
@@ -115,12 +115,14 @@ export const IncidenciasView: React.FC<IncidenciasViewProps> = ({
               placeholder="Buscar por código, título o descripción..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search size={18} color="#64748B" />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search size={18} color="#64748B" />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
           </Grid>

@@ -92,7 +92,7 @@ export const IncidenciaDetailModal: React.FC<IncidenciaDetailModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       {/* Header */}
       <Box sx={{ p: 2.5, bgcolor: '#0057B8', color: '#FFFFFF', position: 'relative' }}>
         <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: '#FFFFFF' }}>

@@ -1,6 +1,7 @@
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
   signInWithPopup,
   onAuthStateChanged,
@@ -167,6 +168,33 @@ export class AuthRepository {
       return {
         success: false,
         message: 'No se pudo iniciar sesión con Google.',
+      };
+    }
+  }
+
+  /**
+   * Send password recovery / reset email using Firebase Auth
+   */
+  static async sendPasswordReset(email: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return {
+        success: true,
+        message: 'Se ha enviado un enlace de recuperación a su correo electrónico registrado. Por favor revise su bandeja de entrada o spam.',
+      };
+    } catch (error: any) {
+      console.error('AuthRepository sendPasswordReset error:', error);
+      let message = 'Error al enviar el correo de recuperación.';
+      if (error?.code === 'auth/user-not-found') {
+        message = 'No se encontró ninguna cuenta registrada con este correo electrónico.';
+      } else if (error?.code === 'auth/invalid-email') {
+        message = 'El formato de correo electrónico ingresado no es válido.';
+      } else if (error?.code === 'auth/too-many-requests') {
+        message = 'Demasiadas solicitudes recibidas. Por favor espere unos minutos antes de reintentar.';
+      }
+      return {
+        success: false,
+        message,
       };
     }
   }

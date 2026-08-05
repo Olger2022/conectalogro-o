@@ -326,7 +326,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
                     {trm.tituloTramite}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" display="block">
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                     {trm.departamentoResponsable}
                   </Typography>
                 </Paper>

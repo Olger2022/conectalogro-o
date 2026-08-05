@@ -13,7 +13,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material';
-import { Eye, Sun, Moon, Type, ShieldCheck } from 'lucide-react';
+import { Eye, Sun, Moon, Type, ShieldCheck, ZapOff } from 'lucide-react';
 import { useAppStore } from '../../stores/useAppStore';
 
 interface AccessibilityPanelProps {
@@ -22,10 +22,16 @@ interface AccessibilityPanelProps {
 }
 
 export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ open, onClose }) => {
-  const { accessibility, toggleDarkMode, toggleHighContrast, setFontSizeMultiplier } = useAppStore();
+  const {
+    accessibility,
+    toggleDarkMode,
+    toggleHighContrast,
+    toggleReducedMotion,
+    setFontSizeMultiplier,
+  } = useAppStore();
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3, p: 1 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pb: 1 }}>
         <Eye color="#0057B8" size={24} />
         <Box>
@@ -52,7 +58,7 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ open, on
             </Box>
             <Switch checked={accessibility.highContrast} onChange={toggleHighContrast} color="primary" />
           </Box>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
             Fondo negro absoluto con texto amarillo y bordes de alta visibilidad para personas con baja visión.
           </Typography>
         </Box>
@@ -70,8 +76,30 @@ export const AccessibilityPanel: React.FC<AccessibilityPanelProps> = ({ open, on
             </Box>
             <Switch checked={accessibility.darkMode} onChange={toggleDarkMode} />
           </Box>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
             Alterna entre diseño claro institucional y tema oscuro para descanso visual.
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* Reduced Motion */}
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ZapOff size={20} color="#D97706" />
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                Reducción de Movimiento
+              </Typography>
+            </Box>
+            <Switch
+              checked={Boolean(accessibility.reducedMotion)}
+              onChange={toggleReducedMotion}
+              color="warning"
+            />
+          </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+            Desactiva o minimiza animaciones y transiciones complejas para prevenir mareos y distracciones.
           </Typography>
         </Box>
 

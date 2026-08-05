@@ -98,7 +98,7 @@ export const NuevoTramiteModal: React.FC<NuevoTramiteModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       <Box sx={{ p: 2.5, bgcolor: '#2E7D32', color: '#FFFFFF', position: 'relative' }}>
         <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: '#FFFFFF' }}>
           <X size={20} />
@@ -122,7 +122,7 @@ export const NuevoTramiteModal: React.FC<NuevoTramiteModalProps> = ({
         <Paper variant="outlined" sx={{ p: 2, bgcolor: '#F0FDF4', borderColor: '#BBF7D0', mb: 2.5, borderRadius: 2.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography variant="caption" color="text.secondary" display="block">Departamento Emisor</Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Departamento Emisor</Typography>
               <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#166534' }}>
                 {catalogItem.departamento}
               </Typography>
@@ -219,7 +219,7 @@ export const NuevoTramiteModal: React.FC<NuevoTramiteModalProps> = ({
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     Haga clic o arrastre los documentos solicitados
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
                     Formatos soportados: PDF, JPG, PNG (hasta 10MB)
                   </Typography>
                   <Button

@@ -79,7 +79,7 @@ export const TransparenciaView: React.FC = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                   Dirección de Agua Potable y Alcantarillado (EMAPAL-L)
                 </Typography>
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                   Atención de fugas, cortes programados y nuevas acometidas en Logroño Centro, Yaupi y Shimpis.
                 </Typography>
               </Box>
@@ -88,7 +88,7 @@ export const TransparenciaView: React.FC = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                   Dirección de Planificación y Obras Públicas
                 </Typography>
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                   Permisos de construcción, líneas de fábrica, pavimentación y uso de suelo.
                 </Typography>
               </Box>
@@ -97,7 +97,7 @@ export const TransparenciaView: React.FC = () => {
                 <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                   Dirección Financiera y Tesorería
                 </Typography>
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                   Emisión de patentes municipales, certificados de no adeudar y pagos de impuestos prediales.
                 </Typography>
               </Box>

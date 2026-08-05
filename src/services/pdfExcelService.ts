@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
-import { Incidencia, Tramite, INSTITUCION_INFO } from '../types';
+import { Incidencia, Tramite } from '../types';
+import { INSTITUCION_INFO } from '../constants';
 
 export const pdfExcelService = {
   // Generate Official PDF Document for Incident Report or Procedure Certificate

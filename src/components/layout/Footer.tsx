@@ -71,12 +71,12 @@ export const Footer: React.FC = () => {
             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#FFFFFF', mb: 1.5, letterSpacing: 0.5 }}>
               EMERGENCIAS Y HORARIOS
             </Typography>
-            <Typography variant="caption" display="block" sx={{ color: '#CBD5E1', mb: 1 }}>
+            <Typography variant="caption" sx={{ color: '#CBD5E1', mb: 1, display: 'block' }}>
               Horario de Atención Presencial en Palacio Municipal:
               <br />
               <strong>{INSTITUCION_INFO.horario}</strong>
             </Typography>
-            <Typography variant="caption" display="block" sx={{ color: '#F87171', fontWeight: 700 }}>
+            <Typography variant="caption" sx={{ color: '#F87171', fontWeight: 700, display: 'block' }}>
               Teléfono de Emergencias 24/7:
               <br />
               {INSTITUCION_INFO.emergenciasPhone}

@@ -5,6 +5,7 @@ import {
   Typography,
   Box,
   IconButton,
+  Button,
   Badge,
   Tooltip,
   Container,
@@ -194,15 +195,26 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               {isAuthenticated && <RoleSwitcher />}
 
               {!isAuthenticated ? (
-                <IconButton
+                <Button
                   onClick={() => setIsAuthModalOpen(true)}
-                  sx={{ color: '#FFFFFF', bgcolor: '#2E7D32', '&:hover': { bgcolor: '#1B5E20' } }}
+                  variant="contained"
+                  startIcon={<LogIn size={18} />}
+                  sx={{
+                    bgcolor: '#2E7D32',
+                    color: '#FFFFFF',
+                    fontWeight: 800,
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    px: 2,
+                    py: 0.8,
+                    '&:hover': { bgcolor: '#1B5E20' },
+                  }}
                 >
-                  <LogIn size={20} />
-                </IconButton>
+                  Acceder / Registro
+                </Button>
               ) : (
-                <Tooltip title="Cerrar Sesión">
-                  <IconButton onClick={logout} sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                <Tooltip title={`Cerrar Sesión (${user?.nombres || 'Usuario'})`}>
+                  <IconButton onClick={logout} sx={{ color: 'rgba(255,255,255,0.9)', bgcolor: 'rgba(255,255,255,0.1)' }}>
                     <LogOut size={18} />
                   </IconButton>
                 </Tooltip>

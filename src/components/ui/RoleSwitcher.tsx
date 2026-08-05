@@ -97,13 +97,15 @@ export const RoleSwitcher: React.FC = () => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
-        PaperProps={{
-          elevation: 4,
-          sx: {
-            mt: 1,
-            width: 280,
-            borderRadius: 3,
-            p: 1,
+        slotProps={{
+          paper: {
+            elevation: 4,
+            sx: {
+              mt: 1,
+              width: 280,
+              borderRadius: 3,
+              p: 1,
+            },
           },
         }}
       >
@@ -114,7 +116,7 @@ export const RoleSwitcher: React.FC = () => {
           <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 0.5 }}>
             {user.nombres} {user.apellidos}
           </Typography>
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             C.I: {user.cedula}
           </Typography>
           <Box sx={{ mt: 1 }}>{getRoleBadge(user.role)}</Box>

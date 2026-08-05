@@ -124,7 +124,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, isMobile }) => 
               {user.nombres.split(' ')[0]} {user.apellidos.split(' ')[0]}
             </Typography>
           </Box>
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             {user.role === 'admin'
               ? 'Administrador General'
               : user.role === 'funcionario'
@@ -167,11 +167,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, isMobile }) => 
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontSize: '0.9rem',
-                    fontWeight: isSelected ? 700 : 500,
-                  }}
+                  primary={
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: '0.9rem',
+                        fontWeight: isSelected ? 700 : 500,
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                  }
                 />
                 {item.badge && (
                   <Chip
@@ -190,7 +196,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, isMobile }) => 
 
       {/* Footer Info */}
       <Box sx={{ p: 2, textAlign: 'center' }}>
-        <Typography variant="caption" color="text.secondary" display="block">
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
           {INSTITUCION_INFO.nombre}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem' }}>

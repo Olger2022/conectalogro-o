@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProvider, CssBaseline, Box, Container, useMediaQuery } from '@mui/material';
 import { useAppStore } from './stores/useAppStore';
+import { useAuthStore } from './stores/useAuthStore';
 import { createLogronoTheme } from './theme/theme';
 
 import { Header } from './components/layout/Header';
@@ -24,11 +25,22 @@ import { TransparenciaView } from './features/transparencia/TransparenciaView';
 
 import { NotificacionesModal } from './features/notificaciones/NotificacionesModal';
 import { AuthModal } from './features/auth/AuthModal';
+import { FloatingAccessibilityMenu } from './components/ui/FloatingAccessibilityMenu';
 
 import { Incidencia, Tramite, TramiteCatalogoItem } from './types';
 
 export default function App() {
   const { activeModule, accessibility } = useAppStore();
+  const { initAuthListener } = useAuthStore();
+
+  useEffect(() => {
+    const unsubscribe = initAuthListener();
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, [initAuthListener]);
 
   const theme = createLogronoTheme(
     accessibility.darkMode,
@@ -169,6 +181,9 @@ export default function App() {
           onClose={() => setSelectedTramite(null)}
           onUpdate={() => {}}
         />
+
+        {/* Floating Accessibility Widget (Keyboard shortcut Alt + A) */}
+        <FloatingAccessibilityMenu />
       </Box>
     </ThemeProvider>
   );

@@ -202,6 +202,7 @@ export interface AccessibilitySettings {
   fontSizeMultiplier: number; // 1, 1.15, 1.3
   screenReaderOptimized: boolean;
   darkMode: boolean;
+  reducedMotion: boolean;
 }
 
 export interface FilterIncidenciasState {

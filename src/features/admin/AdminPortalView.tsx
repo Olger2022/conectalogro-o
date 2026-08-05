@@ -137,7 +137,7 @@ export const AdminPortalView: React.FC = () => {
                   <TableCell sx={{ fontWeight: 700, color: '#0057B8' }}>{log.entidadId}</TableCell>
                   <TableCell sx={{ fontSize: '0.85rem' }}>{log.detalles}</TableCell>
                   <TableCell>
-                    <Typography variant="caption" display="block">{log.ipAddress}</Typography>
+                    <Typography variant="caption" sx={{ display: 'block' }}>{log.ipAddress}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {new Date(log.timestamp).toLocaleString('es-EC')}
                     </Typography>
@@ -200,11 +200,11 @@ export const AdminPortalView: React.FC = () => {
                     Estado del Servidor y Base de Datos
                   </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary" paragraph>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   Servicio activo en Cloud Run / Firebase. Sincronización bidireccional IndexedDB + Firestore configurada.
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                <Typography variant="caption" color="text.secondary" display="block">
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                   Cifrado AES-256 en reposo y SSL/TLS 1.3 en tránsito.
                 </Typography>
               </CardContent>

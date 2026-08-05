@@ -169,7 +169,7 @@ export const NuevaIncidenciaModal: React.FC<NuevaIncidenciaModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       <Box sx={{ p: 2.5, bgcolor: '#0057B8', color: '#FFFFFF', position: 'relative' }}>
         <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: '#FFFFFF' }}>
           <X size={20} />
@@ -295,8 +295,10 @@ export const NuevaIncidenciaModal: React.FC<NuevaIncidenciaModalProps> = ({
             value={direccionAproximada}
             onChange={(e) => setDireccionAproximada(e.target.value)}
             placeholder="Ej: Av. Miguel Tinoco frente a la escuela"
-            InputProps={{
-              startAdornment: <MapPin size={18} color="#0057B8" style={{ marginRight: 8 }} />,
+            slotProps={{
+              input: {
+                startAdornment: <MapPin size={18} color="#0057B8" style={{ marginRight: 8 }} />,
+              },
             }}
           />
 

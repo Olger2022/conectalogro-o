@@ -22,6 +22,7 @@ interface AppState {
   accessibility: AccessibilitySettings;
   toggleDarkMode: () => void;
   toggleHighContrast: () => void;
+  toggleReducedMotion: () => void;
   setFontSizeMultiplier: (multiplier: number) => void;
 
   isNotificationsOpen: boolean;
@@ -44,6 +45,7 @@ export const useAppStore = create<AppState>((set) => ({
     fontSizeMultiplier: 1,
     screenReaderOptimized: false,
     darkMode: false,
+    reducedMotion: false,
   },
 
   toggleDarkMode: () =>
@@ -59,6 +61,14 @@ export const useAppStore = create<AppState>((set) => ({
       accessibility: {
         ...state.accessibility,
         highContrast: !state.accessibility.highContrast,
+      },
+    })),
+
+  toggleReducedMotion: () =>
+    set((state) => ({
+      accessibility: {
+        ...state.accessibility,
+        reducedMotion: !state.accessibility.reducedMotion,
       },
     })),
 

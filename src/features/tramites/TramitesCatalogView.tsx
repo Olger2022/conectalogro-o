@@ -101,12 +101,14 @@ export const TramitesCatalogView: React.FC<TramitesCatalogViewProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{ mb: 3 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search size={18} color="#64748B" />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search size={18} color="#64748B" />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
 
@@ -158,7 +160,7 @@ export const TramitesCatalogView: React.FC<TramitesCatalogViewProps> = ({
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Box>
-                        <Typography variant="caption" color="text.secondary" display="block">Tasa Municipal</Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Tasa Municipal</Typography>
                         <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#2E7D32' }}>
                           ${item.costoUSD.toFixed(2)} USD
                         </Typography>

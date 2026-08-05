@@ -6,6 +6,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   ListItemIcon,
   Divider,
@@ -67,8 +68,10 @@ export const NotificacionesModal: React.FC = () => {
       anchor="right"
       open={isNotificationsOpen}
       onClose={() => setIsNotificationsOpen(false)}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 380 }, p: 0 },
+      slotProps={{
+        paper: {
+          sx: { width: { xs: '100%', sm: 380 }, p: 0 },
+        },
       }}
     >
       {/* Drawer Header */}
@@ -100,8 +103,7 @@ export const NotificacionesModal: React.FC = () => {
           <List disablePadding>
             {notifs.map((n) => (
               <React.Fragment key={n.id}>
-                <ListItem
-                  button
+                <ListItemButton
                   onClick={() => handleSelectNotif(n)}
                   sx={{
                     bgcolor: n.leida ? 'transparent' : 'rgba(0, 87, 184, 0.05)',
@@ -124,13 +126,13 @@ export const NotificacionesModal: React.FC = () => {
                         <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', lineHeight: 1.3 }}>
                           {n.mensaje}
                         </Typography>
-                        <Typography variant="caption" color="text.disabled" display="block" sx={{ mt: 0.5 }}>
+                        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
                           {new Date(n.createdAt).toLocaleString('es-EC')}
                         </Typography>
                       </Box>
                     }
                   />
-                </ListItem>
+                </ListItemButton>
                 <Divider />
               </React.Fragment>
             ))}

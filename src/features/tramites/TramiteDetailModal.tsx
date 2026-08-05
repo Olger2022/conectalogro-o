@@ -14,6 +14,7 @@ import {
   MenuItem,
   Grid,
   Alert,
+  IconButton,
 } from '@mui/material';
 import {
   X,
@@ -73,7 +74,7 @@ export const TramiteDetailModal: React.FC<TramiteDetailModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth slotProps={{ paper: { sx: { borderRadius: 3 } } }}>
       <Box sx={{ p: 2.5, bgcolor: '#2E7D32', color: '#FFFFFF', position: 'relative' }}>
         <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: '#FFFFFF' }}>
           <X size={20} />
@@ -108,7 +109,7 @@ export const TramiteDetailModal: React.FC<TramiteDetailModalProps> = ({
                   Se ha generado su certificado / resolución oficial con validez jurídica del GAD Municipal de Logroño.
                 </Typography>
                 <Box sx={{ p: 1.5, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #DCFCE7' }}>
-                  <Typography variant="caption" color="text.secondary" display="block">Código de Verificación QR / Hash:</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Código de Verificación QR / Hash:</Typography>
                   <Typography variant="subtitle2" sx={{ fontFamily: 'monospace', fontWeight: 800, color: '#0057B8' }}>
                     {tramite.codigoFirmaDigital || 'FIRMA-GAD-LOG-2026-X91A'}
                   </Typography>
